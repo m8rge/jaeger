@@ -67,14 +67,14 @@ func (f *Factory) InitFromOptions(opts Options) {
 func (f *Factory) Initialize(metricsFactory metrics.Factory, logger *zap.Logger) error {
 	f.metricsFactory, f.logger = metricsFactory, logger
 
-	store, archiveStore, capabilities, err := f.builder.Build()
+	services, err := f.builder.Build()
 	if err != nil {
 		return err
 	}
 
-	f.store = store
-	f.archiveStore = archiveStore
-	f.capabilities = capabilities
+	f.store = services.Store
+	f.archiveStore = services.ArchiveStore
+	f.capabilities = services.Capabilities
 	logger.Info("External plugin storage configuration", zap.Any("configuration", f.options.Configuration))
 	return nil
 }

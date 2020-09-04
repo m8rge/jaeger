@@ -32,7 +32,7 @@ type Configuration struct {
 	PluginLogLevel          string `yaml:"log-level" mapstructure:"log_level"`
 }
 
-// Build instantiates a StoragePlugin
+// Build instantiates a PluginServices
 func (c *Configuration) Build() (*PluginServices, error) {
 	// #nosec G204
 	cmd := exec.Command(c.PluginBinary, "--config", c.PluginConfigurationFile)
@@ -67,9 +67,14 @@ func (c *Configuration) Build() (*PluginServices, error) {
 	if !ok {
 		return nil, fmt.Errorf("unexpected type for plugin \"%s\"", shared.StoragePluginIdentifier)
 	}
-
-	archiveStoragePlugin := raw.(shared.ArchiveStoragePlugin)
-	capabilities := raw.(shared.PluginCapabilities)
+	archiveStoragePlugin, ok := raw.(shared.ArchiveStoragePlugin)
+	if !ok {
+		return nil, fmt.Errorf("unexpected type for plugin \"%s\"", shared.StoragePluginIdentifier)
+	}
+	capabilities, ok := raw.(shared.PluginCapabilities)
+	if !ok {
+		return nil, fmt.Errorf("unexpected type for plugin \"%s\"", shared.StoragePluginIdentifier)
+	}
 
 	return &PluginServices{
 		Store:        storagePlugin,
